@@ -1,0 +1,80 @@
+// ───────── hook (story: the Monday road) ─────────
+const HK = { reza: cue("h0", "reza"), monday: cue("h0", "monday"), types: cue("h0", "types"), two: cue("h0", "two"), night: cue("h0", "night"), ask: cue("h0", "ask"), wait: cue("h0", "wait"), morning: cue("h0", "morning") };
+const ROADY = 760;
+const Truck: React.FC<{ x: number; f: number }> = ({ x, f }) => (
+  <div style={{ position: "absolute", left: x, top: ROADY - 150 + Math.sin(f / 3) * 1.5, width: 360, height: 160 }}>
+    <div style={{ position: "absolute", left: 0, top: 10, width: 240, height: 110, borderRadius: 8, background: "linear-gradient(180deg,#F8FAFC,#CBD5E1)", border: "3px solid #94A3B8" }}><div style={{ position: "absolute", left: 18, top: 34, fontSize: 24, fontWeight: 900, color: "#1D4ED8", letterSpacing: 2 }}>OPEN ROAD</div></div>
+    <div style={{ position: "absolute", left: 246, top: 30, width: 100, height: 90, borderRadius: "10px 30px 8px 8px", background: "linear-gradient(180deg,#DC2626,#991B1B)" }}><div style={{ position: "absolute", left: 50, top: 12, width: 38, height: 30, borderRadius: "4px 16px 4px 4px", background: "#BAE6FD" }} /></div>
+    {[40, 180, 300].map((wx) => <div key={wx} style={{ position: "absolute", left: wx, top: 110, width: 44, height: 44, borderRadius: 22, background: "#0F172A", border: "6px solid #475569", boxSizing: "border-box", transform: `rotate(${f * 20}deg)` }}><div style={{ width: 4, height: 32, margin: "0 auto", background: "#94A3B8" }} /></div>)}
+  </div>
+);
+const Hook: React.FC<{ f: number }> = ({ f }) => {
+  const night = lin(f, HK.night - 10, HK.night + 10) * (1 - lin(f, HK.morning, HK.morning + 16));
+  const dawn = lin(f, HK.morning - 4, HK.morning + 16);
+  const roadShift = (f * 14) % 120;
+  const signs = ["MON 7:00 · Oct 5", "MON 7:00 · Oct 12", "MON 7:00 · Oct 19", "MON 7:00 · Oct 26"];
+  const signX = (k: number) => 1920 - (f - (HK.monday + k * 22)) * 26;
+  const typedCount = signs.filter((_, k) => signX(k) < 760).length;
+  return (
+    <AbsoluteFill style={{ fontFamily: FONT }}>
+      <AbsoluteFill style={{ background: `linear-gradient(180deg, ${night > 0.5 ? "#020617" : "#0B1A3A"} 0%, ${dawn > 0 ? `rgba(251,146,60,${0.7 * dawn})` : "#0F2350"} 70%)` }} />
+      <Backdrop f={f} warm={dawn * 0.4} w={1920} h={1080} />
+      <Stage f={f} dur={DURATIONS.h0}>
+        {/* title */}
+        <div style={{ position: "absolute", left: 120, top: 90, opacity: pr(f, HK.reza - 6, 10) }}>
+          <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: 6, color: "#93C5FD" }}>OPEN ROAD CDL ACADEMY</div>
+          <div style={{ marginTop: 6, fontSize: 60, fontWeight: 900, color: "#F8FAFC" }}>{typed(f, HK.reza - 4, "Reza's Monday routine.", 0.8)}</div>
+        </div>
+        {/* stars + moon at night, sun at dawn */}
+        {night > 0 && Array.from({ length: 40 }).map((_, i) => <div key={i} style={{ position: "absolute", left: (i * 211) % 1900, top: 40 + ((i * 97) % 420), width: 3, height: 3, borderRadius: 2, background: "#fff", opacity: night * (0.4 + 0.6 * Math.abs(Math.sin(f / 10 + i))) }} />)}
+        <div style={{ position: "absolute", left: 1620, top: 120, width: 110, height: 110, borderRadius: 55, background: "#F1F5F9", boxShadow: "0 0 60px #F1F5F9AA", opacity: night }}><div style={{ position: "absolute", left: 30, top: -8, width: 100, height: 100, borderRadius: 50, background: "#020617" }} /></div>
+        <div style={{ position: "absolute", left: 1560, top: ROADY - 120 * dawn, width: 200, height: 200, borderRadius: 100, background: "radial-gradient(circle,#FDE68A,#F97316)", boxShadow: "0 0 120px #F97316", opacity: dawn }} />
+        {/* road */}
+        <div style={{ position: "absolute", left: 0, top: ROADY, width: 1920, height: 70, background: "#1E293B", borderTop: "5px solid #475569" }}>
+          <div style={{ position: "absolute", left: -roadShift, top: 30, width: 2100, height: 8, background: "repeating-linear-gradient(90deg,#FBBF24 0 60px,transparent 60px 120px)" }} />
+        </div>
+        {/* Monday signposts passing, each one = the same reminder typed again */}
+        {signs.map((s, k) => {
+          const x = signX(k);
+          if (x > 1920 || x < -300 || f < HK.monday) return null;
+          return (
+            <div key={s} style={{ position: "absolute", left: x, top: ROADY - 210, transform: "scale(0.85)", transformOrigin: "50% 100%", opacity: 0.9 }}>
+              <div style={{ width: 230, padding: "12px 14px", borderRadius: 10, background: "#166534", border: "4px solid #F8FAFC", color: "#F8FAFC", fontSize: 20, fontWeight: 900, textAlign: "center" }}>{s}</div>
+              <div style={{ width: 8, height: 120, margin: "0 auto", background: "#94A3B8" }} />
+            </div>
+          );
+        })}
+        <Truck x={300} f={f} />
+        {/* two class chats receiving the same hand-typed message */}
+        <div style={{ position: "absolute", left: 760, top: 220, width: 760, opacity: pr(f, HK.types - 6, 10) * (1 - lin(f, HK.night - 10, HK.night)) }}>
+          {["Class B — Evening", "Class A — Evening"].map((c, i) => (
+            <div key={c} style={{ marginTop: i ? 14 : 0, padding: "14px 18px", borderRadius: 14, background: "#0F172A", border: `2px solid ${f >= HK.two + i * 10 ? "#60A5FA" : "#334155"}`, display: "flex", alignItems: "center", gap: 14 }}>
+              <span style={{ width: 120, fontSize: 16, fontWeight: 900, color: "#93C5FD" }}>{c}</span>
+              <span style={{ flex: 1, fontSize: 18, fontWeight: 700, color: "#E2E8F0" }}>{f >= HK.two + i * 10 ? "Yard schedule this week… bring your logbook." : typed(f, HK.types, "Yard schedule this week…", 0.9)}</span>
+              <span style={{ fontSize: 15, fontWeight: 900, color: "#FBBF24" }}>×{Math.max(1, typedCount)}</span>
+            </div>
+          ))}
+        </div>
+      </Stage>
+      {/* night questions hang on a "waiting" line */}
+      {f >= HK.ask - 2 && (
+        <div style={{ position: "absolute", left: 760, top: 240, width: 1000 }}>
+          {[["Kim", "How many psi for the air brake check?"], ["Luis", "Do I need the logbook Tuesday?"], ["Ana", "What's the coupling order again?"], ["Tom", "Is the quiz open-book?"]].map(([w, q], i) => {
+            const at = HK.ask + i * 6;
+            const drop = pr(f, at, 12);
+            const hrs = f >= HK.wait ? Math.min(8, Math.floor(lin(f, HK.wait, HK.morning + 10) * 8)) : 0;
+            return (
+              <div key={w} style={{ position: "relative", marginTop: 14, height: 76, opacity: drop, transform: `translateY(${(1 - drop) * -120}px)` }}>
+                <div style={{ position: "absolute", left: 0, top: 0, width: 640, padding: "12px 16px", borderRadius: 14, background: "#F8FAFC", fontSize: 19, fontWeight: 800, color: "#111827" }}><span style={{ color: "#2563EB" }}>{w}:</span> {q}</div>
+                <div style={{ position: "absolute", left: 660, top: 14, width: 300, height: 22, borderRadius: 11, background: "#1E293B", overflow: "hidden" }}><div style={{ width: `${(hrs / 8) * 100}%`, height: "100%", background: "linear-gradient(90deg,#F59E0B,#EF4444)" }} /></div>
+                <div style={{ position: "absolute", left: 660, top: 42, fontSize: 15, fontWeight: 800, color: "#FCA5A5" }}>{hrs ? `unanswered · ${hrs}h` : "11:42 pm"}</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      <BeatCaption f={f} end={DURATIONS.h0} beats={[[HK.reza, "Reza runs a truck driving school."], [HK.monday, "Every Monday at 7…", "Every Monday"], [HK.types, "…the same reminder, typed by hand.", "same reminder"], [HK.night, "Every night, students ask questions…", "Every night"], [HK.wait, "…that wait until morning.", "wait until morning"]]} />
+    </AbsoluteFill>
+  );
+};
+

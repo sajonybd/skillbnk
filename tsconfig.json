@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "es2022"],
+    "module": "ES2022",
+    "target": "ES2022",
+    "strict": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "jsx": "react",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "include": ["src"]
+}

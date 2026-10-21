@@ -1,0 +1,64 @@
+// ───────── hook (story: the event that won't sit still) ─────────
+const HK = { amara: cue("h0", "amara"), head: cue("h0", "head"), inbox: cue("h0", "inbox"), week: cue("h0", "week"), wrong: cue("h0", "wrong") };
+const CGX = 360, CGY = 250, CCW = 230, CRH = 90;
+const DAYS5 = ["MON", "TUE", "WED", "THU", "FRI"];
+const Hook: React.FC<{ f: number }> = ({ f }) => {
+  const warm = lin(f, HK.week - 6, HK.wrong + 20);
+  // ghost event jumps between guesses while "class times live in her head"
+  const guesses: [number, number][] = [[1, 2], [1, 3], [2, 2], [3, 3], [1, 2]];
+  const gi = f >= HK.head ? Math.floor((f - HK.head) / 9) % guesses.length : 0;
+  const [gd, gr] = f >= HK.week ? [1, 2] : guesses[gi];
+  const jitter = f >= HK.head && f < HK.week ? Math.sin(f * 2.3) * 4 : 0;
+  const zoom = lin(f, HK.week, HK.week + 18);
+  const mails = ["Zoom link", "Re: Zoom link", "NEW Zoom link", "Fwd: link v3", "USE THIS ONE", "Re: which link?"];
+  const dotX = lin(f, HK.week + 14, HK.wrong + 2);
+  return (
+    <AbsoluteFill style={{ fontFamily: FONT }}>
+      <Backdrop f={f} warm={warm} w={1920} h={1080} />
+      <Stage f={f} dur={DURATIONS.h0}>
+        <div style={{ position: "absolute", left: 120, top: 80, opacity: pr(f, HK.amara - 6, 10) }}>
+          <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: 6, color: "#F87171" }}>BRIGHTVEIN PHLEBOTOMY SCHOOL</div>
+          <div style={{ marginTop: 6, fontSize: 60, fontWeight: 900, color: "#F8FAFC" }}>{typed(f, HK.amara - 4, "When is class, actually?", 0.8)}</div>
+        </div>
+        {/* paper week grid */}
+        <div style={{ position: "absolute", left: CGX, top: CGY, width: CCW * 5, height: CRH * 5 + 50, borderRadius: 18, background: "#F8FAFC", boxShadow: "0 30px 80px #000A", overflow: "hidden", opacity: pr(f, HK.amara, 12), transform: `scale(${1 + zoom * 0.08})`, transformOrigin: `${CCW * 2.5}px 60%` }}>
+          {DAYS5.map((d, i) => <div key={d} style={{ position: "absolute", left: i * CCW, top: 0, width: CCW, height: 50, borderLeft: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 900, color: zoom > 0 && i === 2 ? "#DC2626" : "#334155", background: zoom > 0 && i === 2 ? "#FEE2E2" : "#fff" }}>{d}</div>)}
+          {["4 PM", "5 PM", "6 PM", "7 PM", "8 PM"].map((h, r) => <div key={h} style={{ position: "absolute", left: 0, top: 50 + r * CRH, width: CCW * 5, height: CRH, borderTop: "1px solid #E2E8F0", fontSize: 14, fontWeight: 700, color: "#94A3B8", padding: 6, boxSizing: "border-box" }}>{h}</div>)}
+          {/* the event that won't settle */}
+          {f >= HK.head - 4 && (
+            <>
+              <div style={{ position: "absolute", left: gd * CCW + 10 + jitter + 6, top: 50 + gr * CRH + 8, width: CCW - 20, height: CRH * 2 - 16, borderRadius: 10, background: "#06B6D455", opacity: f < HK.week ? 0.7 : 0 }} />
+              <div style={{ position: "absolute", left: gd * CCW + 10 + jitter, top: 50 + gr * CRH + 8, width: CCW - 20, height: CRH * 2 - 16, borderRadius: 10, background: "#FEE2E2", border: "3px dashed #DC2626", padding: 10, boxSizing: "border-box", fontSize: 18, fontWeight: 900, color: "#991B1B" }}>Venipuncture lab<div style={{ fontSize: 15, fontWeight: 700 }}>{["6 pm?", "7 pm?", "Wed??", "Thu 7?", "6 pm?"][gi]}</div></div>
+            </>
+          )}
+          {/* wrong-day arrival on Wednesday */}
+          {zoom > 0 && (
+            <>
+              <div style={{ position: "absolute", left: 2 * CCW + 10, top: 50 + 2 * CRH + 8, width: CCW - 20, height: CRH * 2 - 16, borderRadius: 10, border: "3px solid #334155", background: "repeating-linear-gradient(45deg,#F1F5F9 0 12px,#E2E8F0 12px 24px)", opacity: zoom }} />
+              <div style={{ position: "absolute", left: 2 * CCW + 30 + dotX * 120, top: 50 + 2 * CRH + 60, width: 30, height: 30, borderRadius: 15, background: "#16A34A", boxShadow: "0 0 0 6px #16A34A44" }} />
+              <div style={{ position: "absolute", left: 2 * CCW + 16, top: 50 + 4 * CRH - 24, fontSize: 15, fontWeight: 900, color: "#334155", opacity: pr(f, HK.wrong - 6, 8) }}>empty room</div>
+              <svg width={CCW * 5} height={CRH * 5 + 50} style={{ position: "absolute", inset: 0 }}><path d={`M ${2 * CCW + 20} ${50 + 2 * CRH} C ${1.7 * CCW} ${50 + 1.2 * CRH}, ${1.5 * CCW} ${50 + 1.2 * CRH}, ${1.4 * CCW} ${50 + 2 * CRH + 10}`} fill="none" stroke="#DC2626" strokeWidth={5} strokeDasharray="400" strokeDashoffset={400 * (1 - lin(f, HK.wrong - 4, HK.wrong + 12))} /></svg>
+              <div style={{ position: "absolute", left: 1 * CCW + 16, top: 50 + 1 * CRH + 10, fontSize: 16, fontWeight: 900, color: "#DC2626", opacity: pr(f, HK.wrong + 8, 8) }}>class was Tuesday</div>
+            </>
+          )}
+        </div>
+        {/* inbox of Zoom links stacking up */}
+        {f >= HK.inbox - 4 && mails.map((m, i) => {
+          const at = HK.inbox + i * 5;
+          const k = pr(f, at, 12);
+          return (
+            <div key={m} style={{ position: "absolute", left: 1440 - (1 - k) * 600, top: 300 + i * 18 - (1 - k) * 200, width: 300, height: 170, transform: `rotate(${(i % 2 ? 3 : -3) * k}deg)`, opacity: k * (1 - 0.5 * zoom) }}>
+              <div style={{ position: "absolute", inset: 0, borderRadius: 10, background: "#E2E8F0", border: "2px solid #94A3B8" }} />
+              <div style={{ position: "absolute", left: 0, top: 0, width: 0, height: 0, borderLeft: "150px solid transparent", borderRight: "150px solid transparent", borderTop: "80px solid #CBD5E1" }} />
+              <div style={{ position: "absolute", left: 16, bottom: 16, fontSize: 18, fontWeight: 900, color: "#0F172A" }}>{m}</div>
+            </div>
+          );
+        })}
+        {f >= HK.inbox && <div style={{ position: "absolute", left: 1440, top: 250, fontSize: 22, fontWeight: 900, color: "#FCA5A5", opacity: pr(f, HK.inbox + 20, 8) * (1 - zoom) }}>{Math.min(6, Math.floor((f - HK.inbox) / 5) + 1)} different links</div>}
+      </Stage>
+      <Stamp f={f} at={HK.wrong + 6} x={1540} y={760} text="WRONG DAY" />
+      <BeatCaption f={f} end={DURATIONS.h0} beats={[[HK.amara, "Amara runs a phlebotomy school."], [HK.head, "Class times live in her head…", "in her head"], [HK.inbox, "…Zoom links live in her inbox…", "in her inbox"], [HK.week, "…and every week, someone shows up on the wrong day.", "wrong day"]]} />
+    </AbsoluteFill>
+  );
+};
+
