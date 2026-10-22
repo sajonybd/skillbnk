@@ -45,6 +45,7 @@ import { CalendarStoryVideo, TOTAL_FRAMES as CAL_FRAMES } from "./CalendarStoryV
 import { AvailabilityStoryVideo, TOTAL_FRAMES as AV_FRAMES } from "./AvailabilityStoryVideo";
 import { StaffAttendanceStoryVideo, TOTAL_FRAMES as SA_FRAMES } from "./StaffAttendanceStoryVideo";
 import { CertificatesStoryVideo, TOTAL_FRAMES as CERT_FRAMES } from "./CertificatesStoryVideo";
+import { ProgramDashboardStoryVideo, TOTAL_FRAMES as PROGDASH_FRAMES } from "./ProgramDashboardStoryVideo";
 import { TemplatesStoryVideo, TOTAL_FRAMES as TPL_FRAMES } from "./TemplatesStoryVideo";
 import { SlidesStoryVideo, TOTAL_FRAMES as SLIDES_FRAMES } from "./SlidesStoryVideo";
 import { InterviewLibraryStoryVideo, TOTAL_FRAMES as IQ_FRAMES } from "./InterviewLibraryStoryVideo";
@@ -297,6 +298,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="AvailabilityStoryVideo" component={AvailabilityStoryVideo} durationInFrames={AV_FRAMES} fps={30} width={1920} height={1080} />
       <Composition id="StaffAttendanceStoryVideo" component={StaffAttendanceStoryVideo} durationInFrames={SA_FRAMES} fps={30} width={1920} height={1080} />
       <Composition id="CertificatesStoryVideo" component={CertificatesStoryVideo} durationInFrames={CERT_FRAMES} fps={30} width={1920} height={1080} />
+      <Composition id="ProgramDashboardStoryVideo" component={ProgramDashboardStoryVideo} durationInFrames={PROGDASH_FRAMES} fps={30} width={1920} height={1080} />
       <Composition id="TemplatesStoryVideo" component={TemplatesStoryVideo} durationInFrames={TPL_FRAMES} fps={30} width={1920} height={1080} />
       <Composition id="SlidesStoryVideo" component={SlidesStoryVideo} durationInFrames={SLIDES_FRAMES} fps={30} width={1920} height={1080} />
       <Composition id="InterviewLibraryStoryVideo" component={InterviewLibraryStoryVideo} durationInFrames={IQ_FRAMES} fps={30} width={1920} height={1080} />

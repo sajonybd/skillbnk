@@ -18,7 +18,7 @@ import { makeTL, typed, Toast, StoryMain, Table, PageHead, Fx } from "./storyShe
  * Voice: python3 generate-voice-story.py src/CertificatesStoryVideo.tsx public/certstory
  */
 
-const SEGS = ["h0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10", "p11"] as const;
+const SEGS = ["h0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10", "d11", "p11"] as const;
 type Seg = (typeof SEGS)[number];
 const DURATIONS: Record<Seg, number> = {
   h0: 332,
@@ -32,10 +32,11 @@ const DURATIONS: Record<Seg, number> = {
   d8: 197,
   d9: 352,
   d10: 202,
+  d11: 587,
   p11: 156,
 };
 const VOICE_SPEED = 1.12;
-const VOICED: string[] = ["h0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10", "p11"];
+const VOICED: string[] = ["h0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10", "d11", "p11"];
 // @WT-BEGIN
 const WT: Record<string, number[]> = {
   h0: [2, 20, 30, 41, 52, 63, 73, 87, 115, 120, 129, 140, 143, 151, 172, 174, 179, 188, 210, 213, 223, 244, 246, 250, 255, 277, 280, 290, 294],
@@ -49,6 +50,7 @@ const WT: Record<string, number[]> = {
   d8: [24, 43, 58, 75, 78, 85, 98, 128, 135, 142, 151, 165, 166, 175],
   d9: [2, 16, 25, 34, 66, 72, 81, 91, 98, 117, 123, 145, 157, 168, 172, 183, 193, 202, 226, 231, 237, 247, 273, 273, 286, 299, 306, 309, 313, 321],
   d10: [2, 25, 31, 38, 65, 72, 80, 85, 93, 108, 114, 125, 147, 157, 163, 171],
+  d11: [2, 20, 38, 44, 48, 58, 68, 78, 87, 111, 112, 121, 128, 135, 150, 159, 194, 194, 205, 216, 221, 239, 239, 248, 256, 263, 270, 303, 311, 318, 328, 345, 352, 366, 388, 392, 400, 409, 436, 444, 458, 466, 471, 478, 487, 513, 529, 537, 544, 552],
   p11: [2, 29, 61, 73, 117, 117],
 };
 // @WT-END
@@ -65,6 +67,7 @@ const SCRIPTS: Record<Seg, string> = {
   d8: "Upload certificate saves it to Marisol's record. Export gives Olivia a copy to print.",
   d9: "Back in All Certificates, every certificate has an ID, the student, the bootcamp, who generated it, and when. She searches by name, copies the ID, and sends it by email.",
   d10: "Now, the learner side. Marisol gets the email, with her certificate, and her name spelled right.",
+  d11: "Months later, a clinic wants proof before hiring her. They open skillbank dot com slash verification, sign in, and type the validation number printed on her certificate. One wrong character, and nothing is found. With the exact number, Verify Certificate brings up the original certificate, the transcript, and the testimonial.",
   p11: "Forty graduates. Forty certificates. Zero reprints.",
 };
 
@@ -100,18 +103,28 @@ const T = {
   email: cue("d9", "email", -6),
   learner: cue("d10", "learner", -8),
   openMail: cue("d10", "email", -4),
+  verify: S.d11,
+  vType: cue("d11", "type", -4),
+  vWrong: cue("d11", "wrong", -4),
+  vExact: cue("d11", "exact", -6),
+  vBtn: cue("d11", "verify", -4),
+  vCert: cue("d11", "original", -4),
+  vTrans: cue("d11", "transcript", -4),
+  vTest: cue("d11", "testimonial", -4),
 };
-const CLICKS = [T.clickMenu, T.clickGen, T.pickStudent, T.tabs, T.tabProg, T.tabComp, T.instr, T.det1, T.tplTab, T.gold, T.transTab, T.addRow, T.upload, T.exportB, T.search, T.copyId, T.email, T.openMail];
+const CLICKS = [T.clickMenu, T.clickGen, T.pickStudent, T.tabs, T.tabProg, T.tabComp, T.instr, T.det1, T.tplTab, T.gold, T.transTab, T.addRow, T.upload, T.exportB, T.search, T.copyId, T.email, T.openMail, T.vType, T.vWrong - 14, T.vBtn];
 
 const STUDENT = "Marisol Gonzalez";
 const PROG = "Medical Coding — Fall 2026";
+const MID = "mG4KZQW-13";
+const VURL = "https://www.skillbnk.com/verification";
 const lab = (x: number, y: number, t: string) => <div style={{ position: "absolute", left: x, top: y, fontSize: 14, fontWeight: 800, color: "#374151" }}>{t}</div>;
 const box = (x: number, y: number, w: number, on: boolean, v: React.ReactNode, ph: string, sel?: boolean) => <div style={{ position: "absolute", left: x, top: y, width: w, height: 42, borderRadius: 10, boxSizing: "border-box", border: `2px solid ${on ? BLUE : "#D1D5DB"}`, boxShadow: on ? "0 0 0 4px #C7D2FE" : "none", background: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 12px", fontSize: 14, fontWeight: 600, color: v ? INK : "#9CA3AF", whiteSpace: "nowrap", overflow: "hidden" }}>{v || ph}{sel && <span style={{ color: GRAY }}>⌄</span>}</div>;
 
 // ───────── certificate artwork (no faces) ─────────
 type Tpl = "Classic Blue" | "Gold Elegance" | "Modern Slate";
 const TPLC: Record<Tpl, [string, string, string]> = { "Classic Blue": ["#1E3A8A", "#DBEAFE", "#1D4ED8"], "Gold Elegance": ["#78350F", "#FEF3C7", "#B45309"], "Modern Slate": ["#0F172A", "#F1F5F9", "#334155"] };
-const Cert: React.FC<{ tpl: Tpl; w: number; name: string; instr?: string; line1?: string; line2?: string }> = ({ tpl, w, name, instr, line1, line2 }) => {
+const Cert: React.FC<{ tpl: Tpl; w: number; name: string; instr?: string; line1?: string; line2?: string; vid?: string }> = ({ tpl, w, name, instr, line1, line2, vid }) => {
   const [dark, light, mid] = TPLC[tpl];
   const s = w / 600;
   return (
@@ -125,6 +138,7 @@ const Cert: React.FC<{ tpl: Tpl; w: number; name: string; instr?: string; line1?
       <div style={{ position: "absolute", left: 70 * s, top: 320 * s, width: 160 * s, borderTop: `${2 * s}px solid ${dark}`, paddingTop: 6 * s, textAlign: "center", fontSize: 12 * s, fontWeight: 800, color: "#334155" }}>{instr || "Instructor"}</div>
       <div style={{ position: "absolute", right: 70 * s, top: 320 * s, width: 160 * s, borderTop: `${2 * s}px solid ${dark}`, paddingTop: 6 * s, textAlign: "center", fontSize: 12 * s, fontWeight: 800, color: "#334155" }}>Oct 23, 2026</div>
       <div style={{ position: "absolute", left: "50%", top: 300 * s, marginLeft: -36 * s, width: 72 * s, height: 72 * s, borderRadius: 36 * s, background: mid, border: `${4 * s}px solid ${light}`, boxShadow: `0 0 0 ${3 * s}px ${mid}` }} />
+      <div style={{ position: "absolute", left: 0, right: 0, top: 384 * s, textAlign: "center", fontFamily: FONT, fontSize: 9.5 * s, fontWeight: 700, color: "#334155" }}><b>Validation Number:</b> {vid || "Pending"} · <span style={{ color: "#2563eb" }}>{VURL}</span></div>
     </div>
   );
 };
@@ -132,17 +146,17 @@ const Cert: React.FC<{ tpl: Tpl; w: number; name: string; instr?: string; line1?
 // ───────── all certificates list ─────────
 type C = { id: string; n: string; e: string; s: string; by: string; d: string };
 const LIST: C[] = [
-  { id: "CR-2026-0412", n: "Devon Harris", e: "devon.h@mail.com", s: "Evening", by: "Olivia Grant", d: "Oct 22, 2026" },
-  { id: "CR-2026-0411", n: "Priya Raman", e: "priya.r@mail.com", s: "Evening", by: "Olivia Grant", d: "Oct 22, 2026" },
-  { id: "CR-2026-0410", n: "Lucas Moreau", e: "lucas.m@mail.com", s: "Morning", by: "Ben Ito", d: "Oct 21, 2026" },
-  { id: "CR-2026-0409", n: "Aisha Bello", e: "aisha.b@mail.com", s: "Morning", by: "Ben Ito", d: "Oct 21, 2026" },
+  { id: "pR7TQMX-12", n: "Devon Harris", e: "devon.h@mail.com", s: "Evening", by: "Olivia Grant", d: "Oct 22, 2026" },
+  { id: "kD2WNLA-11", n: "Priya Raman", e: "priya.r@mail.com", s: "Evening", by: "Olivia Grant", d: "Oct 22, 2026" },
+  { id: "hV9CBEJ-10", n: "Lucas Moreau", e: "lucas.m@mail.com", s: "Morning", by: "Ben Ito", d: "Oct 21, 2026" },
+  { id: "zA5LUPF-9", n: "Aisha Bello", e: "aisha.b@mail.com", s: "Morning", by: "Ben Ito", d: "Oct 21, 2026" },
 ];
 const COLS = [{ h: "Certificate ID", w: 170 }, { h: "Student Name", w: 200 }, { h: "Email", w: 170 }, { h: "Bootcamp", w: 220 }, { h: "Session", w: 100 }, { h: "Generated By", w: 130 }, { h: "Generated Date", w: 140 }, { h: "Action", w: 130 }];
 const TBX = 14, TBY = 120, RH = 62;
 const rowY = (i: number) => TBY + 54 + i * RH + RH / 2;
 const AllCerts: React.FC<{ f: number }> = ({ f }) => {
   const added = f >= T.upload + 4;
-  const rows: C[] = added ? [{ id: "CR-2026-0413", n: STUDENT, e: "marisol.g@mail.com", s: "Evening", by: "Olivia Grant", d: "Today" }, ...LIST] : LIST;
+  const rows: C[] = added ? [{ id: "mG4KZQW-13", n: STUDENT, e: "marisol.g@mail.com", s: "Evening", by: "Olivia Grant", d: "Today" }, ...LIST] : LIST;
   const q = f >= T.search && f < T.copyId + 40 ? typed(f, T.search + 4, "Marisol", 0.4) : "";
   const filt = q.length >= 4;
   const pick = f >= T.pickStudent - 30 && f < T.pickStudent + 4;
@@ -222,7 +236,7 @@ const GenPage: React.FC<{ f: number }> = ({ f }) => {
             <div style={{ marginTop: 10, display: "flex", gap: 14 }}>
               {(["Classic Blue", "Gold Elegance", "Modern Slate"] as Tpl[]).map((t) => <div key={t} style={{ padding: 8, borderRadius: 12, border: `3px solid ${tpl === t ? BLUE : LINE}`, background: tpl === t ? "#EEF2FF" : "#fff" }}><Cert tpl={t} w={250} name={STUDENT} /><div style={{ marginTop: 6, textAlign: "center", fontSize: 14, fontWeight: 900, color: tpl === t ? BLUE : INK }}>{t}</div></div>)}
             </div>
-            <div style={{ position: "absolute", left: 250, top: 300, transform: `scale(${0.96 + 0.04 * pr(f, T.gold + 2, 10)})`, transformOrigin: "50% 0" }}><Cert tpl={tpl} w={380} name={STUDENT} instr="Dr. Rachel Kim, CPC" line1="Has successfully completed 240 hours of ICD-10 and CPT coding" line2="and achieved an overall score of 92%." /></div>
+            <div style={{ position: "absolute", left: 250, top: 300, transform: `scale(${0.96 + 0.04 * pr(f, T.gold + 2, 10)})`, transformOrigin: "50% 0" }}><Cert tpl={tpl} w={380} name={STUDENT} instr="Dr. Rachel Kim, CPC" line1="Has successfully completed 240 hours of ICD-10 and CPT coding" line2="and achieved an overall score of 92%." vid={MID} /></div>
           </>
         )}
         {tab === 2 && <Transcript f={f} />}
@@ -275,10 +289,76 @@ const Mail: React.FC<{ f: number }> = ({ f }) => {
       {open && (
         <div style={{ position: "absolute", left: 450, top: 24, right: 30, opacity: pr(f, T.openMail + 2, 10) }}>
           <div style={{ fontSize: 24, fontWeight: 900, color: INK }}>Your certificate is ready</div>
-          <div style={{ marginTop: 6, fontSize: 14, fontWeight: 700, color: GRAY }}>From: CodeRight Medical Coding · To: marisol.g@mail.com · Certificate ID CR-2026-0413</div>
-          <div style={{ marginTop: 20 }}><Cert tpl="Gold Elegance" w={620} name={STUDENT} instr="Dr. Rachel Kim, CPC" line1="Has successfully completed 240 hours of ICD-10 and CPT coding" line2="and achieved an overall score of 92%." /></div>
+          <div style={{ marginTop: 6, fontSize: 14, fontWeight: 700, color: GRAY }}>From: CodeRight Medical Coding · To: marisol.g@mail.com · Certificate ID mG4KZQW-13</div>
+          <div style={{ marginTop: 20 }}><Cert tpl="Gold Elegance" w={620} name={STUDENT} instr="Dr. Rachel Kim, CPC" line1="Has successfully completed 240 hours of ICD-10 and CPT coding" line2="and achieved an overall score of 92%." vid={MID} /></div>
         </div>
       )}
+    </div>
+  );
+};
+
+
+// ───────── public verification page (SB-Frontend app/verification) ─────────
+const VCX = 450, VCW = 700; // card x / width inside the 1600-wide window
+const INPUT_Y = 318, BTN_Y = 382;
+const vScroll = (f: number) => 640 * pr(f, T.vCert, 24) + 650 * pr(f, T.vTrans, 24) + 590 * pr(f, T.vTest, 24);
+const band = (y: number, t: string) => <div style={{ position: "absolute", left: 0, top: y, width: 1600, textAlign: "center", fontSize: 44, color: "#000", padding: "12px 0", borderTop: `2px solid ${LINE}`, borderBottom: `2px solid ${LINE}` }}>{t}</div>;
+const VerifyPage: React.FC<{ f: number }> = ({ f }) => {
+  const wrong = MID.slice(0, -1);
+  const q = f < T.vExact ? typed(f, T.vType + 4, wrong, 0.45) : wrong + (f >= T.vExact + 4 ? "3" : "");
+  const notFound = f >= T.vWrong - 8 && f < T.vExact;
+  const loading = (f >= T.vWrong - 14 && f < T.vWrong - 8) || (f >= T.vBtn && f < T.vBtn + 10);
+  const ok = f >= T.vBtn + 10;
+  const y = -vScroll(f);
+  return (
+    <div style={{ position: "absolute", inset: 0, fontFamily: FONT, background: "linear-gradient(180deg,#F8FAFC,#fff)", overflow: "hidden" }}>
+      <div style={{ position: "absolute", left: 0, top: 0, width: 1600, height: 2600, transform: `translateY(${y}px)` }}>
+        {/* input card */}
+        <div style={{ position: "absolute", left: VCX, top: 30, width: VCW, height: 500, borderRadius: 14, background: "#fff", border: `1px solid ${LINE}`, boxShadow: "0 1px 3px #0001" }}>
+          <div style={{ position: "absolute", left: VCW / 2 - 28, top: 26, width: 56, height: 56, borderRadius: 28, background: "#E8ECFB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, color: BLUE }}>⛨</div>
+          <div style={{ position: "absolute", left: 0, right: 0, top: 96, textAlign: "center", fontSize: 28, fontWeight: 800, color: "#000" }}>Certificate Verification</div>
+          <div style={{ position: "absolute", left: 120, right: 120, top: 138, textAlign: "center", fontSize: 15, color: "#4B5563", lineHeight: 1.45 }}>Confirm the authenticity of a skillBNK certificate, transcript, or testimonial.</div>
+          <div style={{ position: "absolute", left: 32, top: 210, fontSize: 15, fontWeight: 600, color: "#374151" }}>Enter certificate verification ID ⓘ</div>
+          <div style={{ position: "absolute", left: 32, top: 240, width: VCW - 64, height: 46, borderRadius: 8, boxSizing: "border-box", border: `2px solid ${f >= T.vType && f < T.vBtn + 6 ? BLUE : "#D1D5DB"}`, background: "#fff", display: "flex", alignItems: "center", gap: 10, padding: "0 12px", fontSize: 17, fontWeight: 600, color: q ? INK : "#9CA3AF" }}><span style={{ color: GRAY }}>⌕</span>{q || "e.g. oUOGGYP-7"}</div>
+          <div style={{ position: "absolute", left: 32, top: 304, width: VCW - 64, height: 46, borderRadius: 8, background: (f >= T.vWrong - 16 && f < T.vWrong - 10) || (f >= T.vBtn - 2 && f < T.vBtn + 4) ? "#1D4ED8" : "#2563EB", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700 }}>{loading ? "◌  Verifying..." : "Verify Certificate"}</div>
+          <div style={{ position: "absolute", left: 32, top: 372, width: VCW - 64, padding: 16, boxSizing: "border-box", borderRadius: 10, background: "#F3F5FD", fontSize: 14, color: "#4B5563", lineHeight: 1.6 }}>
+            <div>→ You can verify existing student course completion, progress, and testimonial.</div>
+            <div>→ The verification ID is printed on the certificate itself, right below the student's name.</div>
+            <div>→ Email addresses aren't searchable here — you'll need the exact certificate ID to verify.</div>
+          </div>
+        </div>
+        {notFound && (
+          <div style={{ position: "absolute", left: VCX, top: 610, width: VCW, height: 190, borderRadius: 14, background: "#FEF2F2", border: "1px solid #FEE2E2", textAlign: "center", opacity: pr(f, T.vWrong - 8, 8) }}>
+            <div style={{ margin: "26px auto 0", width: 48, height: 48, borderRadius: 24, background: "#FEE2E2", color: "#DC2626", fontSize: 24, display: "flex", alignItems: "center", justifyContent: "center" }}>!</div>
+            <div style={{ marginTop: 12, fontSize: 17, fontWeight: 700, color: "#000" }}>We couldn't find a certificate for <span style={{ fontFamily: "monospace", color: "#DC2626" }}>"{wrong}"</span></div>
+            <div style={{ margin: "8px auto 0", width: 460, fontSize: 14, color: "#4B5563", lineHeight: 1.5 }}>Double-check the ID for typos — it's case-sensitive and printed directly below the student's name on the certificate.</div>
+          </div>
+        )}
+        {ok && (
+          <div style={{ opacity: pr(f, T.vBtn + 10, 10) }}>
+            {band(640, "Certificate")}
+            <div style={{ position: "absolute", left: 420, top: 740 }}><Cert tpl="Gold Elegance" w={760} name={STUDENT} instr="Dr. Rachel Kim, CPC" line1="Has successfully completed 240 hours of ICD-10 and CPT coding" line2="and achieved an overall score of 92%." vid={MID} /></div>
+            <div style={{ position: "absolute", left: 710, top: 1290, padding: "12px 24px", borderRadius: 10, background: "#0F172A", color: "#fff", fontSize: 16, fontWeight: 700 }}>Print Certificate</div>
+            {band(1290 + 70, "Transcript")}
+            <div style={{ position: "absolute", left: 360, top: 1460, width: 880, padding: 28, boxSizing: "border-box", borderRadius: 12, background: "#fff", border: `1px solid ${LINE}` }}>
+              <div style={{ textAlign: "center", fontSize: 26, fontWeight: 900, letterSpacing: 4, color: INK }}>TRANSCRIPT</div>
+              <div style={{ textAlign: "center", fontSize: 15, fontWeight: 700, color: GRAY }}>Performance Evaluation Report</div>
+              <div style={{ marginTop: 14, display: "flex", justifyContent: "space-between", fontSize: 14, color: "#374151" }}><span><b>Student ID:</b> {MID}</span><span><b>Course Name:</b> {PROG}</span><span><b>Issue Date:</b> Oct 23, 2026</span></div>
+              <div style={{ marginTop: 14, borderRadius: 8, border: `1px solid ${LINE}`, overflow: "hidden" }}>
+                <div style={{ display: "flex", background: "#F9FAFB", fontSize: 14, fontWeight: 800, color: GRAY }}>{["Areas of Evaluation", "Expected Points", "Student Points"].map((h, i) => <div key={h} style={{ width: [460, 180, 180][i], padding: "10px 14px" }}>{h}</div>)}</div>
+                {[...AREAS, ["Final certification exam", 20, 18] as [string, number, number]].map((r) => <div key={r[0]} style={{ display: "flex", borderTop: `1px solid ${LINE}`, fontSize: 15, fontWeight: 600, color: INK }}><div style={{ width: 460, padding: "9px 14px" }}>{r[0]}</div><div style={{ width: 180, padding: "9px 14px" }}>{r[1]}</div><div style={{ width: 180, padding: "9px 14px" }}>{r[2]}</div></div>)}
+              </div>
+            </div>
+            {band(1940, "Testimonial")}
+            <div style={{ position: "absolute", left: 360, top: 2040, width: 880, padding: 32, boxSizing: "border-box", borderRadius: 12, background: "#fff", border: `1px solid ${LINE}`, fontSize: 16, color: "#374151", lineHeight: 1.6 }}>
+              <div style={{ textAlign: "center", fontSize: 26, fontWeight: 900, letterSpacing: 4, color: INK }}>TESTIMONIAL</div>
+              <div style={{ marginTop: 14, fontWeight: 700 }}>To Whom It May Concern</div>
+              <div style={{ marginTop: 6 }}>This is to certify that {STUDENT} completed {PROG} at CodeRight Medical Coding Bootcamp with an overall score of 92%. Her audit accuracy was the best in the cohort.</div>
+              <div style={{ marginTop: 14, fontSize: 14 }}><b>Verify at:</b> <span style={{ color: "#2563eb" }}>{VURL}</span></div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -289,7 +369,7 @@ const CAM: K4[] = mono([
   [DEMO_START, 960, 540, 1.0], [T.clickGen, 1100, 480, 1.06], [T.record, 820, 520, 1.1], [T.tabs, 820, 620, 1.1],
   [T.info, 1100, 470, 1.08], [T.det1 + 40, 1100, 600, 1.08], [T.tplTab, 1100, 500, 1.06], [T.gold + 10, 1100, 560, 1.08],
   [T.transTab, 1100, 500, 1.06], [T.totals, 1100, 620, 1.08], [T.upload - 6, 1100, 460, 1.08], [T.list, 960, 540, 1.0], [T.search, 960, 480, 1.08],
-  [T.email - 10, 1100, 480, 1.08], [T.learner, 960, 540, 1.0], [T.openMail + 20, 1100, 560, 1.06], [PAY_START, 960, 540, 1.0],
+  [T.email - 10, 1100, 480, 1.08], [T.learner, 960, 540, 1.0], [T.openMail + 20, 1100, 560, 1.06], [T.verify, 960, 540, 1.0], [T.vType, 960, 470, 1.1], [T.vWrong + 10, 960, 600, 1.08], [T.vBtn, 960, 480, 1.08], [T.vCert, 960, 540, 1.04], [PAY_START, 960, 540, 1.0],
 ]).map(calmK);
 const GP = (x: number, y: number) => MA(444 + 20 + x, 116 + 20 + y);
 const CUR: P3[] = monoP([
@@ -305,6 +385,7 @@ const CUR: P3[] = monoP([
   [T.upload, ...MA(1350 - 24 - 100, 76)], [T.exportB, ...MA(1350 - 24 - 220 - 60, 76)],
   [T.search, ...MA(780, 48)], [T.copyId, ...MA(TBX + 80, rowY(0))], [T.email, ...MA(TBX + 1190 - 60, rowY(0))],
   [T.learner + 20, 1500, 860], [T.openMail, ...MA(210, 60 + 40)],
+  [T.verify + 10, 1500, 860], [T.vType, ...CT(VCX + 300, 30 + 263)], [T.vWrong - 14, ...CT(VCX + 350, 30 + 327)], [T.vExact, ...CT(VCX + 300, 30 + 263)], [T.vBtn, ...CT(VCX + 350, 30 + 327)], [T.vCert + 30, 1560, 900],
 ]);
 const STEPS = [
   { at: T.clickMenu, to: S.d2, label: "Generate a certificate" },
@@ -314,17 +395,21 @@ const STEPS = [
   { at: T.transTab, to: T.upload, label: "Transcript and totals" },
   { at: T.upload, to: T.list, label: "Upload and export" },
   { at: T.list, to: T.learner, label: "Search, copy ID, email" },
-  { at: T.learner, to: PAY_START, label: "What the learner gets" },
+  { at: T.learner, to: T.verify, label: "What the learner gets" },
+  { at: T.verify, to: PAY_START, label: "Verify it online" },
 ];
 
 const Demo: React.FC<{ f: number }> = ({ f }) => {
+  const isV = f >= T.verify;
   const isL = f >= T.learner;
   const gen = f >= T.pickStudent + 2 && f < T.list;
   return (
     <AbsoluteFill style={{ fontFamily: FONT, overflow: "hidden" }}>
       <Backdrop f={f} w={1920} h={1080} />
       <CameraWorld f={f} keys={CAM} vc={[960, 540]} size={[1920, 1080]}>
-        {isL ? (
+        {isV ? (
+          <LandWin f={f} inAt={T.verify} url="www.skillbnk.com/verification" sidebar={false} main={<VerifyPage f={f} />} />
+        ) : isL ? (
           <LandWin f={f} inAt={T.learner} url="mail.example.com/inbox" sidebar={false} main={<Mail f={f} />} />
         ) : (
           <LandWin f={f} inAt={f >= T.list ? T.list : T.appIn} branch="CodeRight — Online" url={gen ? "academy.skillbnk.com/generate-certificate/marisol-gonzalez" : "academy.skillbnk.com/all-certificates"} active={gen ? "Generate Certificate" : f >= T.clickMenu ? "All Certificates" : "Dashboard"} openGroup="Billing & Certificate"
@@ -335,7 +420,8 @@ const Demo: React.FC<{ f: number }> = ({ f }) => {
       </CameraWorld>
       <StepChipL f={f} steps={STEPS} />
       <PortalTagL f={f} at={DEMO_START + 14} out={T.learner - 4} text="Training provider portal" />
-      <PortalTagL f={f} at={T.learner + 4} out={PAY_START - 6} text="Learner's inbox" />
+      <PortalTagL f={f} at={T.learner + 4} out={T.verify - 4} text="Learner's inbox" />
+      <PortalTagL f={f} at={T.verify + 4} out={PAY_START - 6} text="Public verification page" />
     </AbsoluteFill>
   );
 };
@@ -391,7 +477,7 @@ const Payoff: React.FC<{ f: number }> = ({ f }) => (
     <Backdrop f={f} w={1920} h={1080} />
     <AbsoluteFill style={{ background: "radial-gradient(circle at 50% 40%, rgba(251,191,36,0.22), transparent 62%)" }} />
     {Array.from({ length: 5 }).map((_, i) => <div key={i} style={{ position: "absolute", left: 560 + i * 40, top: 160 + i * 18, transform: `rotate(${(i - 2) * 3}deg)`, opacity: pr(f, PAY_START + 4 + i * 4, 10) }}><Cert tpl="Gold Elegance" w={600} name={i === 4 ? STUDENT : ["Devon Harris", "Priya Raman", "Lucas Moreau", "Aisha Bello"][i]} instr="Dr. Rachel Kim, CPC" line1="Has successfully completed 240 hours of ICD-10 and CPT coding" /></div>)}
-    <div style={{ position: "absolute", left: 0, top: 800, width: 1920, textAlign: "center", fontSize: 44, fontWeight: 800, color: "#FDE68A", opacity: pr(f, PY.zero - 6, 14) }}>40 certificates · 0 reprints</div>
+    <div style={{ position: "absolute", left: 0, top: 800, width: 1920, textAlign: "center", fontSize: 44, fontWeight: 800, color: "#FDE68A", opacity: pr(f, PY.zero - 6, 14) }}>40 certificates · 0 reprints · verifiable online</div>
   </AbsoluteFill>
 );
 
@@ -404,11 +490,11 @@ const SFX: Fx[] = (() => {
   add(DURATIONS.h0 - 6, "whoosh", 0.4); add(DEMO_START - 2, "whoosh", 0.3);
   CLICKS.forEach((c) => add(c, "click", 0.5));
   add(T.gold + 2, "ding", 0.35); add(T.addRow + 2, "pop", 0.35); add(T.upload + 3, "chime", 0.5); add(T.exportB + 3, "pop", 0.35); add(T.email + 3, "chime", 0.4);
-  add(T.list, "whoosh", 0.3); add(T.learner, "whoosh", 0.35); add(PAY_START - 3, "whoosh", 0.4); add(PY.zero, "chime", 0.5);
+  add(T.verify, "whoosh", 0.35); add(T.vWrong - 8, "thud", 0.3); add(T.vBtn + 10, "chime", 0.45); add(T.list, "whoosh", 0.3); add(T.learner, "whoosh", 0.35); add(PAY_START - 3, "whoosh", 0.4); add(PY.zero, "chime", 0.5);
   return a;
 })();
 
 export const CertificatesStoryVideo: React.FC = () => {
   const f = useCurrentFrame();
-  return <StoryMain f={f} tl={TL} segs={SEGS} voiced={VOICED} dur={DURATIONS} folder="certstory" hook={<Hook f={f} />} demo={<Demo f={f} />} payoff={<Payoff f={f} />} sfx={SFX} flashes={[T.list, T.learner]} />;
+  return <StoryMain f={f} tl={TL} segs={SEGS} voiced={VOICED} dur={DURATIONS} folder="certstory" hook={<Hook f={f} />} demo={<Demo f={f} />} payoff={<Payoff f={f} />} sfx={SFX} flashes={[T.list, T.learner, T.verify]} />;
 };
