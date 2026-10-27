@@ -40,6 +40,12 @@ export const LEARNER_MENU: RItem[] = [
   { t: "Interviews", i: "🎤", kids: ["Mock Interviews"] },
   { t: "Chat", i: "💬" }, { t: "Community", i: "👥" }, { t: "My Notes", i: "📝" },
 ];
+/** company (organization) portal sidebar — order from the live Company portal (IntegrationsVideo F_MENU) */
+export const COMPANY_MENU: RItem[] = [
+  { t: "Dashboard", i: "▦" }, { t: "Branch Management", i: "🏢" }, { t: "Courses & Programs", i: "🎓" }, { t: "Attendance", i: "🗓" },
+  { t: "Staff Management", i: "🧑‍💼" }, { t: "Marketing", i: "📣" }, { t: "Form Builder", i: "📝" }, { t: "Menu Builder", i: "☰" },
+  { t: "Website Builder", i: "🌐" }, { t: "Enrollment form Builder", i: "🧾" }, { t: "Integrations", i: "🔌" },
+];
 const ALIAS: Record<string, string> = { Templates: "Template", Slides: "Slide" };
 const norm = (a: string) => ALIAS[a] ?? a;
 /** group that stays open: the one holding `active`, else the one holding `open` */
@@ -56,8 +62,8 @@ const layoutMenu = (open?: string, M: RItem[] = REAL_MENU) => {
   return out;
 };
 /** world point of a real sidebar item (child names use the real labels, aliases ok) */
-export const realMenuPt = (name: string, open?: string, learner = false): [number, number] => {
-  const M = learner ? LEARNER_MENU : REAL_MENU;
+export const realMenuPt = (name: string, open?: string, learner = false, company = false): [number, number] => {
+  const M = company ? COMPANY_MENU : learner ? LEARNER_MENU : REAL_MENU;
   const it = layoutMenu(open ?? groupOf(name, M), M).find((r) => r.t === norm(name));
   const y = it ? it.y + (it.kid ? KID : ROW) / 2 : MTOP;
   return CT(it?.kid ? 140 : 125, y);
@@ -84,8 +90,8 @@ const MENU_ICON = ["▦", "🎓", "👥", "💳", "💬", "⚙"];
 /** browser window with title bar, optional sidebar, main slot and a full-content overlay slot */
 export const LandWin: React.FC<{
   f: number; inAt: number; url: string; active?: string; sidebar?: boolean; subtitle?: string;
-  main?: React.ReactNode; overlay?: React.ReactNode; menu?: string[]; menuIcons?: string[]; openGroup?: string; laptop?: boolean; learner?: boolean; who?: string; prog?: string; branch?: string;
-}> = ({ f, inAt, url, active = "Dashboard", sidebar = true, main, overlay, openGroup, laptop = true, learner = false, who, prog, branch }) => {
+  main?: React.ReactNode; overlay?: React.ReactNode; menu?: string[]; menuIcons?: string[]; openGroup?: string; laptop?: boolean; learner?: boolean; who?: string; prog?: string; branch?: string; company?: string;
+}> = ({ f, inAt, url, active = "Dashboard", sidebar = true, main, overlay, openGroup, laptop = true, learner = false, who, prog, branch, company }) => {
   const s = sp(f, inAt, 30, { damping: 18, stiffness: 120 });
   const o = Math.min(1, s * 1.6);
   const lift = (1 - Math.min(1, s)) * 90, sc = 0.93 + 0.07 * Math.min(1, s);
@@ -98,8 +104,8 @@ export const LandWin: React.FC<{
         <div style={{ marginLeft: 24, flex: 1, maxWidth: 760, height: 32, borderRadius: 16, background: "#fff", border: `1px solid ${LINE}`, display: "flex", alignItems: "center", padding: "0 16px", fontSize: 17, fontWeight: 600, color: GRAY, whiteSpace: "nowrap", overflow: "hidden" }}>🔒&nbsp;{url}</div>
       </div>
       <div style={{ position: "absolute", left: 0, top: BAR, width: WW, height: WH - BAR, background: "#F8FAFC" }}>
-        {sidebar && <RealSidebar active={active} open={openGroup} M={learner ? LEARNER_MENU : REAL_MENU} />}
-        {sidebar && <RealHeader learner={learner} who={who} prog={prog} branch={branch} />}
+        {sidebar && <RealSidebar active={active} open={openGroup} M={company ? COMPANY_MENU : learner ? LEARNER_MENU : REAL_MENU} />}
+        {sidebar && <RealHeader learner={learner} who={who} prog={prog} branch={branch} company={company} />}
         <div style={{ position: "absolute", left: sidebar ? SBW : 0, top: sidebar ? HDR : 0, width: WW - (sidebar ? SBW : 0), height: sidebar ? `calc(100% - ${HDR}px)` : "100%", overflow: "hidden" }}>{main}</div>
         {overlay}
       </div>
@@ -132,7 +138,15 @@ const RealSidebar: React.FC<{ active: string; open?: string; M: RItem[] }> = ({ 
   );
 };
 
-const RealHeader: React.FC<{ learner?: boolean; who?: string; prog?: string; branch?: string }> = ({ learner, who, prog, branch }) => learner ? (
+const RealHeader: React.FC<{ learner?: boolean; who?: string; prog?: string; branch?: string; company?: string }> = ({ learner, who, prog, branch, company }) => company ? (
+  <div style={{ position: "absolute", left: SBW, top: 0, width: WW - SBW, height: HDR, background: "#fff", borderBottom: `1px solid ${LINE}`, display: "flex", alignItems: "center", padding: "0 22px", gap: 14, boxSizing: "border-box" }}>
+    <div style={{ fontSize: 20, color: GRAY }}>☰</div>
+    <div style={{ fontSize: 17, fontWeight: 800, color: INK }}>{company}</div>
+    <div style={{ flex: 1 }} />
+    <div style={{ position: "relative", fontSize: 19, color: GRAY }}>🔔<span style={{ position: "absolute", right: -3, top: -2, width: 8, height: 8, borderRadius: "50%", background: "#EF4444" }} /></div>
+    <Avatar t="OA" s={36} c1="#7C3AED" c2="#5B21B6" />
+  </div>
+) : learner ? (
   <div style={{ position: "absolute", left: SBW, top: 0, width: WW - SBW, height: HDR, background: "#fff", borderBottom: `1px solid ${LINE}`, display: "flex", alignItems: "center", padding: "0 22px", gap: 14, boxSizing: "border-box" }}>
     <div style={{ fontSize: 20, color: GRAY }}>☰</div>
     <div style={{ height: 38, borderRadius: 9, border: `1px solid ${LINE}`, display: "flex", alignItems: "center", gap: 8, padding: "0 14px", fontSize: 15, fontWeight: 700, color: INK }}><span style={{ color: GRAY, fontWeight: 600 }}>Program:</span>{prog ?? "My program"} <span style={{ color: GRAY }}>⌄</span></div>

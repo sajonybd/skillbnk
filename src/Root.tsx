@@ -46,6 +46,9 @@ import { AvailabilityStoryVideo, TOTAL_FRAMES as AV_FRAMES } from "./Availabilit
 import { StaffAttendanceStoryVideo, TOTAL_FRAMES as SA_FRAMES } from "./StaffAttendanceStoryVideo";
 import { CertificatesStoryVideo, TOTAL_FRAMES as CERT_FRAMES } from "./CertificatesStoryVideo";
 import { ProgramDashboardStoryVideo, TOTAL_FRAMES as PROGDASH_FRAMES } from "./ProgramDashboardStoryVideo";
+import { PaymentMethodsStoryVideo, TOTAL_FRAMES as PAYMETH_FRAMES } from "./PaymentMethodsStoryVideo";
+import { PaymentHistoryStoryVideo, TOTAL_FRAMES as PAYHIST_FRAMES } from "./PaymentHistoryStoryVideo";
+import { LearnerCheckoutStoryVideo, TOTAL_FRAMES as CHECKOUT_FRAMES } from "./LearnerCheckoutStoryVideo";
 import { TemplatesStoryVideo, TOTAL_FRAMES as TPL_FRAMES } from "./TemplatesStoryVideo";
 import { SlidesStoryVideo, TOTAL_FRAMES as SLIDES_FRAMES } from "./SlidesStoryVideo";
 import { InterviewLibraryStoryVideo, TOTAL_FRAMES as IQ_FRAMES } from "./InterviewLibraryStoryVideo";
@@ -299,6 +302,9 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="StaffAttendanceStoryVideo" component={StaffAttendanceStoryVideo} durationInFrames={SA_FRAMES} fps={30} width={1920} height={1080} />
       <Composition id="CertificatesStoryVideo" component={CertificatesStoryVideo} durationInFrames={CERT_FRAMES} fps={30} width={1920} height={1080} />
       <Composition id="ProgramDashboardStoryVideo" component={ProgramDashboardStoryVideo} durationInFrames={PROGDASH_FRAMES} fps={30} width={1920} height={1080} />
+      <Composition id="PaymentMethodsStoryVideo" component={PaymentMethodsStoryVideo} durationInFrames={PAYMETH_FRAMES} fps={30} width={1920} height={1080} />
+      <Composition id="PaymentHistoryStoryVideo" component={PaymentHistoryStoryVideo} durationInFrames={PAYHIST_FRAMES} fps={30} width={1920} height={1080} />
+      <Composition id="LearnerCheckoutStoryVideo" component={LearnerCheckoutStoryVideo} durationInFrames={CHECKOUT_FRAMES} fps={30} width={1920} height={1080} />
       <Composition id="TemplatesStoryVideo" component={TemplatesStoryVideo} durationInFrames={TPL_FRAMES} fps={30} width={1920} height={1080} />
       <Composition id="SlidesStoryVideo" component={SlidesStoryVideo} durationInFrames={SLIDES_FRAMES} fps={30} width={1920} height={1080} />
       <Composition id="InterviewLibraryStoryVideo" component={InterviewLibraryStoryVideo} durationInFrames={IQ_FRAMES} fps={30} width={1920} height={1080} />
