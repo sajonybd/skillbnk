@@ -31,8 +31,8 @@ export const Toast: React.FC<{ f: number; at: number; text: string; d?: number }
 
 export const StoryMain: React.FC<{
   f: number; tl: TL; segs: readonly string[]; voiced: string[]; dur: Record<string, number>; folder: string;
-  hook: React.ReactNode; demo: React.ReactNode; payoff: React.ReactNode; sfx: Fx[]; flashes?: number[]; music?: boolean;
-}> = ({ f, tl, segs, voiced, dur, folder, hook, demo, payoff, sfx, flashes = [], music = true }) => {
+  hook: React.ReactNode; demo: React.ReactNode; payoff: React.ReactNode; sfx: Fx[]; flashes?: number[]; music?: boolean; finish?: boolean;
+}> = ({ f, tl, segs, voiced, dur, folder, hook, demo, payoff, sfx, flashes = [], music = true, finish = true }) => {
   const { INTRO_START, DEMO_START, PAY_START, SCENES_END } = tl;
   const mv = (lf: number, len: number) => (music ? 0.1 * Math.min(1, lf / 20) * Math.min(1, (len - lf) / 24) : 0);
   return (
@@ -42,7 +42,7 @@ export const StoryMain: React.FC<{
       <Sequence from={DEMO_START - 2} durationInFrames={PAY_START - DEMO_START + 14}>{demo}</Sequence>
       <Sequence from={PAY_START} durationInFrames={SCENES_END - PAY_START}>{payoff}</Sequence>
       <Sequence from={SCENES_END} durationInFrames={OUTRO_FRAMES}><MainOutro /></Sequence>
-      {(f < INTRO_START + 4 || (f >= DEMO_START - 4 && f < SCENES_END + 2)) && <Finish f={f} w={1920} h={1080} />}
+      {finish && (f < INTRO_START + 4 || (f >= DEMO_START - 4 && f < SCENES_END + 2)) && <Finish f={f} w={1920} h={1080} />}
       <Flash f={f} at={INTRO_START} w={1920} h={1080} />
       <Flash f={f} at={DEMO_START} color="#0B1A55" streak={false} d={6} w={1920} h={1080} />
       {flashes.map((a, i) => <Flash key={i} f={f} at={a} d={5} streak={false} w={1920} h={1080} />)}
